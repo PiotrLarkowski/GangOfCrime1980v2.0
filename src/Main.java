@@ -1,0 +1,15 @@
+import javax.swing.*;
+
+public class Main {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setUndecorated(true);
+
+        MainPanel mainPanel = new MainPanel();
+        frame.add(mainPanel);
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+}
