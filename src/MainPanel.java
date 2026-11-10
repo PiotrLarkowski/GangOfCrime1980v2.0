@@ -2,9 +2,28 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainPanel extends JPanel {
+
+    public static int moneyAmount = 0;
+    public static int respectAmount = 0;
+    public static String familyNameString = "Giovani";
+
+    public static String[] menuOptions = {
+            "DZIELNICA",
+            "MISJE I SKOKI",
+            "CZARNY RYNEK",
+            "MOJA RODZINA",
+            "ARSENAŁ",
+            "LEGALNE BIZNESY"
+    };
+
+
+    private static JLabel moneyLabel, respectLabel, familyNameLabel;
+
     public MainPanel(){
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height));
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setPreferredSize(screenSize);
 
         JPanel topPanel = new JPanel();
         JPanel leftPanel = new JPanel();
@@ -14,6 +33,7 @@ public class MainPanel extends JPanel {
         setPanels(topPanel, leftPanel, bottomPanel, middlePanel);
 
         topPanelAdjustment(topPanel);
+        leftPanelAdjustment(leftPanel);
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(leftPanel, BorderLayout.WEST);
@@ -24,22 +44,49 @@ public class MainPanel extends JPanel {
         this.addKeyListener(keyListener);
 
         this.setFocusable(true);
+        this.requestFocusInWindow();
         this.setVisible(true);
     }
 
+    private static void leftPanelAdjustment(JPanel leftPanel){
+        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 10));
+        for (String option : menuOptions) {
+            JButton menuButton = new JButton(option);
+
+            menuButton.setFont(new Font("Courier New", Font.BOLD, 18));
+            menuButton.setForeground(Color.WHITE);
+            menuButton.setBackground(new Color(50, 50, 50));
+            menuButton.setFocusPainted(false);
+            menuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            menuButton.setFocusable(false);
+
+            menuButton.setMaximumSize(new Dimension(220, 40));
+
+            leftPanel.add(menuButton);
+            leftPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Odstęp między przyciskami
+        }
+
+        setLabelsFont(leftPanel);
+    }
+
+
     private static void topPanelAdjustment(JPanel topPanel) {
-        int moneyAmount = 0;
-        int respectAmount = 0;
-        String familyNameString = "Giovani";
-        JLabel money = new JLabel("GOTOWKA: " + moneyAmount + "              ");
-        JLabel respect = new JLabel("SZACUNEK: " + respectAmount + "              ");
-        JLabel familyName = new JLabel("NAZWA RODZINY: " + familyNameString + "              ");
 
-        topPanel.add(money);
-        topPanel.add(respect);
-        topPanel.add(familyName);
+        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 15));
 
-        setLabels(topPanel,new Font("Courier New",Font.BOLD,30));
+        moneyLabel = new JLabel("GOTOWKA: " + moneyAmount + "              ");
+        respectLabel = new JLabel("SZACUNEK: " + respectAmount + "              ");
+        familyNameLabel = new JLabel("NAZWA RODZINY: " + familyNameString + "              ");
+
+        topPanel.add(moneyLabel);
+        topPanel.add(respectLabel);
+        topPanel.add(familyNameLabel);
+
+        setLabelsFont(topPanel);
+    }
+
+    public static void setLabelsFont(JPanel panel){
+        setLabels(panel,new Font("Courier New",Font.BOLD,30));
     }
 
     public static void setLabels(JPanel panel, Font fontName) {
@@ -62,5 +109,8 @@ public class MainPanel extends JPanel {
         bottomPanel.setPreferredSize(new Dimension(0, 50));
     }
 
-
+    public void addMoney(int amount) {
+        this.moneyAmount += amount;
+        this.moneyLabel.setText("GOTÓWKA: $" + this.moneyAmount);
+    }
 }
