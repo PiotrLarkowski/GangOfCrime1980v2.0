@@ -45,6 +45,8 @@ public class MainPanel extends JPanel {
         KeyListener keyListener = new KeyListener(this);
         this.addKeyListener(keyListener);
 
+        changeGamePhase(1);
+
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.setVisible(true);
@@ -52,6 +54,7 @@ public class MainPanel extends JPanel {
 
     private static void leftPanelAdjustment(JPanel leftPanel){
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         JButton[] menuButtons =
                 {bDzielnica, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy};
         int phase = 1;
@@ -74,7 +77,7 @@ public class MainPanel extends JPanel {
             phase++;
 
             leftPanel.add(button);
-            leftPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Odstęp między przyciskami
+            leftPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         }
 
         setLabelsFont(leftPanel);
@@ -99,6 +102,7 @@ public class MainPanel extends JPanel {
     private static void centerPanelAdjustment(JPanel centerPanel){
 
         temporary.setFont(new Font("Courier New",Font.BOLD,100));
+        temporary.setForeground(Color.YELLOW);
         centerPanel.add(temporary);
     }
 
@@ -126,9 +130,23 @@ public class MainPanel extends JPanel {
         bottomPanel.setPreferredSize(new Dimension(0, 50));
     }
 
-    public static void changeGamePhase(int phase){
+    public static void changeGamePhase(int phase) {
         mainScreenPhase = phase;
-        temporary.setText(mainScreenPhase+"");
+        temporary.setText(String.valueOf(mainScreenPhase));
+
+        JButton[] menuButtons = {
+                bDzielnica, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy
+        };
+
+        for (int i = 0; i < menuButtons.length; i++) {
+            if (i + 1 == phase) {
+                menuButtons[i].setBackground(new Color(140, 100, 20));
+                menuButtons[i].setForeground(Color.YELLOW);
+            } else {
+                menuButtons[i].setBackground(new Color(50, 50, 50));
+                menuButtons[i].setForeground(Color.WHITE);
+            }
+        }
     }
 
     public void addMoney(int amount) {
