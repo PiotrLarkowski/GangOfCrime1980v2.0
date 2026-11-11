@@ -7,17 +7,18 @@ public class MainPanel extends JPanel {
     public static int respectAmount = 0;
     public static String familyNameString = "Giovani";
 
-    public static String[] menuOptions = {
-            "DZIELNICA",
-            "MISJE I SKOKI",
-            "CZARNY RYNEK",
-            "MOJA RODZINA",
-            "ARSENAŁ",
-            "LEGALNE BIZNESY"
-    };
+    public static int mainScreenPhase = 1;
 
+    public static JButton
+            bDzielnica = new JButton("1 - DZIELNICA"),
+            bMisjeiSkoki = new JButton("<html><center>2 - MISJE<br>I SKOKI</center></html>"),
+            bCzarnyRynek = new JButton("3 - CZARNY RYNEK"),
+            bMojaRodzina = new JButton("4 - MOJA RODZINA"),
+            bArsenal = new JButton("5 - ARSENAŁ"),
+            bLegalneBiznesy = new JButton("<html><center>6 - LEGALNE<br>BIZNESY</center></html>");
 
     private static JLabel moneyLabel, respectLabel, familyNameLabel;
+    private static JLabel temporary = new JLabel("1");
 
     public MainPanel(){
         this.setLayout(new BorderLayout());
@@ -34,13 +35,14 @@ public class MainPanel extends JPanel {
 
         topPanelAdjustment(topPanel);
         leftPanelAdjustment(leftPanel);
+        centerPanelAdjustment(middlePanel);
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(leftPanel, BorderLayout.WEST);
         this.add(bottomPanel, BorderLayout.SOUTH);
         this.add(middlePanel, BorderLayout.CENTER);
 
-        KeyListener keyListener = new KeyListener();
+        KeyListener keyListener = new KeyListener(this);
         this.addKeyListener(keyListener);
 
         this.setFocusable(true);
@@ -49,20 +51,29 @@ public class MainPanel extends JPanel {
     }
 
     private static void leftPanelAdjustment(JPanel leftPanel){
-        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 10));
-        for (String option : menuOptions) {
-            JButton menuButton = new JButton(option);
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        JButton[] menuButtons =
+                {bDzielnica, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy};
+        int phase = 1;
+        for (JButton button : menuButtons) {
+            int finalPhase = phase;
+            button.addActionListener(e -> changeGamePhase(finalPhase));
+            button.setFont(new Font("Courier New", Font.BOLD, 18));
+            button.setForeground(Color.WHITE);
+            button.setBackground(new Color(50, 50, 50));
+            button.setFocusPainted(false);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button.setFocusable(false);
 
-            menuButton.setFont(new Font("Courier New", Font.BOLD, 18));
-            menuButton.setForeground(Color.WHITE);
-            menuButton.setBackground(new Color(50, 50, 50));
-            menuButton.setFocusPainted(false);
-            menuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            menuButton.setFocusable(false);
+            if(phase == 2 || phase == 6){
+                button.setMaximumSize(new Dimension(220, 50));
+            }else{
+                button.setMaximumSize(new Dimension(220, 40));
+            }
 
-            menuButton.setMaximumSize(new Dimension(220, 40));
+            phase++;
 
-            leftPanel.add(menuButton);
+            leftPanel.add(button);
             leftPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Odstęp między przyciskami
         }
 
@@ -83,6 +94,12 @@ public class MainPanel extends JPanel {
         topPanel.add(familyNameLabel);
 
         setLabelsFont(topPanel);
+    }
+
+    private static void centerPanelAdjustment(JPanel centerPanel){
+
+        temporary.setFont(new Font("Courier New",Font.BOLD,100));
+        centerPanel.add(temporary);
     }
 
     public static void setLabelsFont(JPanel panel){
@@ -107,6 +124,11 @@ public class MainPanel extends JPanel {
         topPanel.setPreferredSize(new Dimension(0, 60));
         leftPanel.setPreferredSize(new Dimension(250, 0));
         bottomPanel.setPreferredSize(new Dimension(0, 50));
+    }
+
+    public static void changeGamePhase(int phase){
+        mainScreenPhase = phase;
+        temporary.setText(mainScreenPhase+"");
     }
 
     public void addMoney(int amount) {
