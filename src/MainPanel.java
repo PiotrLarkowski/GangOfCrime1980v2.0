@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainPanel extends JPanel {
 
@@ -228,16 +229,16 @@ public class MainPanel extends JPanel {
         }
     }
 
-    private static void showEventDialog(GameEvent event) {
-        // Pobieramy główne okno gry na podstawie etykiety currentTime
+    static void showEventDialog(GameEvent event) {
         Window parentWindow = SwingUtilities.getWindowAncestor(currentTime);
         Frame parentFrame = (parentWindow instanceof Frame) ? (Frame) parentWindow : null;
 
-        // Przekazujemy parentFrame zamiast null - dzięki temu okno pojawi się NA głównym oknie
+        AtomicBoolean exitBool = new AtomicBoolean(false);
+
         JDialog eventDialog = new JDialog(parentFrame, event.getEventTitle(), true);
         eventDialog.setUndecorated(true);
         eventDialog.setSize(650, 420);
-        eventDialog.setLocationRelativeTo(parentFrame); // Wyśrodkowanie względem okna gry
+        eventDialog.setLocationRelativeTo(parentFrame);
 
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBackground(new Color(35, 15, 15));
@@ -258,26 +259,58 @@ public class MainPanel extends JPanel {
         textArea.setFocusable(false);
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
 
-        JButton closeBtn = new JButton("ZROZUMIALEM");
-        closeBtn.setFont(new Font("Courier New", Font.BOLD, 18));
-        closeBtn.setBackground(new Color(140, 100, 20));
-        closeBtn.setForeground(Color.YELLOW);
-        closeBtn.setFocusPainted(false);
-        closeBtn.setPreferredSize(new Dimension(200, 40));
-        closeBtn.addActionListener(e -> eventDialog.dispose());
-
         JPanel btnPanel = new JPanel();
-        btnPanel.setBackground(new Color(35, 15, 15));
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        btnPanel.add(closeBtn);
+
+        if(event.getEventTitle().equals("Zamknij")){
+            JButton yesBtn = new JButton("TAK");
+            yesBtn.setFont(new Font("Courier New", Font.BOLD, 18));
+            yesBtn.setBackground(new Color(140, 100, 20));
+            yesBtn.setForeground(Color.YELLOW);
+            yesBtn.setFocusPainted(false);
+            yesBtn.setPreferredSize(new Dimension(200, 40));
+            yesBtn.addActionListener(e -> {
+                exitBool.set(true);
+                eventDialog.dispose();
+            });
+            btnPanel.setBackground(new Color(35, 15, 15));
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+            btnPanel.add(yesBtn);
+            eventDialog.getRootPane().setDefaultButton(yesBtn);
+
+            JButton noBtn = new JButton("NIE");
+            noBtn.setFont(new Font("Courier New", Font.BOLD, 18));
+            noBtn.setBackground(new Color(140, 100, 20));
+            noBtn.setForeground(Color.YELLOW);
+            noBtn.setFocusPainted(false);
+            noBtn.setPreferredSize(new Dimension(200, 40));
+            noBtn.addActionListener(e -> eventDialog.dispose());
+            btnPanel.setBackground(new Color(35, 15, 15));
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+            btnPanel.add(noBtn);
+        }else {
+            JButton closeBtn = new JButton("ZROZUMIALEM");
+            closeBtn.setFont(new Font("Courier New", Font.BOLD, 18));
+            closeBtn.setBackground(new Color(140, 100, 20));
+            closeBtn.setForeground(Color.YELLOW);
+            closeBtn.setFocusPainted(false);
+            closeBtn.setPreferredSize(new Dimension(200, 40));
+            closeBtn.addActionListener(e -> eventDialog.dispose());
+            btnPanel.setBackground(new Color(35, 15, 15));
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+            btnPanel.add(closeBtn);
+
+            eventDialog.getRootPane().setDefaultButton(closeBtn);
+        }
 
         contentPanel.add(titleLabel, BorderLayout.NORTH);
         contentPanel.add(textArea, BorderLayout.CENTER);
         contentPanel.add(btnPanel, BorderLayout.SOUTH);
 
-        eventDialog.getRootPane().setDefaultButton(closeBtn);
         eventDialog.add(contentPanel);
         eventDialog.setVisible(true);
+        if(exitBool.get()){
+            System.exit(0);
+        }
     }
 
     public int getMainScreenPhase(){

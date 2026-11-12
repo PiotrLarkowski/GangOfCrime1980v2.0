@@ -20,12 +20,21 @@ public class KeyListener implements java.awt.event.KeyListener {
             return;
         }
 
-        if (keyCode >= KeyEvent.VK_TAB) {
+        else if (keyCode == KeyEvent.VK_S) {
             int currentPhase = mainPanel.getMainScreenPhase();
             if(currentPhase <7)
                 currentPhase++;
             else
                 currentPhase = 1;
+            MainPanel.changeGamePhase(currentPhase);
+        }
+
+        else if (keyCode == KeyEvent.VK_W) {
+            int currentPhase = mainPanel.getMainScreenPhase();
+            if(currentPhase >1)
+                currentPhase--;
+            else
+                currentPhase = 7;
             MainPanel.changeGamePhase(currentPhase);
         }
 
@@ -37,20 +46,14 @@ public class KeyListener implements java.awt.event.KeyListener {
         if (keyCode >= KeyEvent.VK_NUMPAD1 && keyCode <= KeyEvent.VK_NUMPAD6) {
             int phase = keyCode - KeyEvent.VK_NUMPAD0;
             MainPanel.changeGamePhase(phase);
+        }else{
+
         }
     }
 
     private void exitGame() {
-        int decyzja = JOptionPane.showConfirmDialog(
-                null,
-                "Czy na pewno chcesz zamknąć?",
-                "Zamknij",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        if (decyzja == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
+        GameEvent gameEvent = new GameEvent(0,"1-1-1944","Zamknij","Czy na pewno chcesz zakonczyn gre?");
+        mainPanel.showEventDialog(gameEvent);
     }
 
     @Override
