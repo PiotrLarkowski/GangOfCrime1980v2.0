@@ -20,8 +20,17 @@ public class KeyListener implements java.awt.event.KeyListener {
             return;
         }
 
+        if (keyCode >= KeyEvent.VK_TAB) {
+            int currentPhase = mainPanel.getMainScreenPhase();
+            if(currentPhase <7)
+                currentPhase++;
+            else
+                currentPhase = 1;
+            MainPanel.changeGamePhase(currentPhase);
+        }
+
         if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_6) {
-            int phase = keyCode - KeyEvent.VK_0; // Np. dla VK_3 (51) - VK_0 (48) = 3
+            int phase = keyCode - KeyEvent.VK_0;
             MainPanel.changeGamePhase(phase);
         }
 

@@ -11,5 +11,9 @@ public class Main {
         frame.add(mainPanel);
 
         frame.setVisible(true);
+
+        SwingUtilities.invokeLater(() -> {
+            MainPanel.checkTodayEvent(MainPanel.currentDateString);
+        });
     }
 }

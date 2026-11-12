@@ -1,7 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class MainPanel extends JPanel {
+
+    public static int currentDay = 1;
+    public static int currentMonth = 1;
+    public static int currentYear = 1944;
+    public static String currentDateString = currentDay +"-"+currentMonth+"-"+currentYear;
+
+    private static ArrayList<GameEvent> gameEvents = new ArrayList<>();
 
     public static int moneyAmount = 0;
     public static int respectAmount = 0;
@@ -10,15 +18,19 @@ public class MainPanel extends JPanel {
     public static int mainScreenPhase = 1;
 
     public static JButton
-            bDzielnica = new JButton("1 - DZIELNICA"),
-            bMisjeiSkoki = new JButton("<html><center>2 - MISJE<br>I SKOKI</center></html>"),
-            bCzarnyRynek = new JButton("3 - CZARNY RYNEK"),
-            bMojaRodzina = new JButton("4 - MOJA RODZINA"),
-            bArsenal = new JButton("5 - ARSENAŁ"),
-            bLegalneBiznesy = new JButton("<html><center>6 - LEGALNE<br>BIZNESY</center></html>");
+            bDzielnica = new JButton("<html><center>1 - BUDYNKI <br> DZIELNICA</center></html>"),
+            bPersonel = new JButton("<html><center>2 - LUDZIE <br> PRESONEL</center></html>"),
+            bMisjeiSkoki = new JButton("<html><center>3 - MISJE<br>I AKCJE</center></html>"),
+            bCzarnyRynek = new JButton("4 - CZARNY RYNEK"),
+            bMojaRodzina = new JButton("5 - MOJA RODZINA"),
+            bArsenal = new JButton("6 - ARSENAŁ"),
+            bLegalneBiznesy = new JButton("<html><center>7 - LEGALNE<br>BIZNESY</center></html>");
+
+    public static JButton nextTurn = new JButton("Zakoncz dzien");
 
     private static JLabel moneyLabel, respectLabel, familyNameLabel;
     private static JLabel temporary = new JLabel("1");
+    private static JLabel currentTime = new JLabel("Data: " + currentDateString);
 
     public MainPanel(){
         this.setLayout(new BorderLayout());
@@ -36,6 +48,7 @@ public class MainPanel extends JPanel {
         topPanelAdjustment(topPanel);
         leftPanelAdjustment(leftPanel);
         centerPanelAdjustment(middlePanel);
+        bottomPanelAdjustment(bottomPanel);
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(leftPanel, BorderLayout.WEST);
@@ -45,18 +58,44 @@ public class MainPanel extends JPanel {
         KeyListener keyListener = new KeyListener(this);
         this.addKeyListener(keyListener);
 
+        createAllGameEvents();
         changeGamePhase(1);
 
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.setVisible(true);
+
+    }
+
+    private void createAllGameEvents() {
+        String[] eventTabDates ={
+          "1-1-1944",
+          "1-1-1944"
+        };
+        String[] eventTabTitle ={
+                "Prolog",
+                "Skromne poczatki"
+        };
+        String[] eventTabText ={
+                "Witaj w grze Gang Of Crime 1980! Twoim glownym zadaniem bedzie zarobic do roku 1980 1 000 000 000$"
+                + " Co jakis czas w zaleznosci od bierzacej daty beda pojawiac sie wydarzenia ktore beda mialy"
+                + " wplyw na Twoja rozgrywke wiec sledz je pilnie! W kazdy dzien mozesz wykonac okreslona ilosc ruchow."
+                + " Jak skoncza Ci sie mozliwe ruchy zakoncz dzien przy pomocy przycisku na dole ekranu."
+                + " Zycze szczecia w podziemnym swiecie. I baw sie dobrze!",
+
+                "Zdobadz 1 000 000$ do konca 1945 roku"
+        };
+        for (int i = 0; i < eventTabText.length; i++) {
+            GameEvent gameEvent = new GameEvent(0,eventTabDates[i], eventTabTitle[i],eventTabText[i]);
+            gameEvents.add(gameEvent);
+        }
     }
 
     private static void leftPanelAdjustment(JPanel leftPanel){
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         JButton[] menuButtons =
-                {bDzielnica, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy};
+                {bDzielnica, bPersonel, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy};
         int phase = 1;
         for (JButton button : menuButtons) {
             int finalPhase = phase;
@@ -68,7 +107,7 @@ public class MainPanel extends JPanel {
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
             button.setFocusable(false);
 
-            if(phase == 2 || phase == 6){
+            if(phase == 1 || phase == 2 || phase == 3 || phase == 7){
                 button.setMaximumSize(new Dimension(220, 50));
             }else{
                 button.setMaximumSize(new Dimension(220, 40));
@@ -83,9 +122,7 @@ public class MainPanel extends JPanel {
         setLabelsFont(leftPanel);
     }
 
-
     private static void topPanelAdjustment(JPanel topPanel) {
-
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 15));
 
         moneyLabel = new JLabel("GOTOWKA: " + moneyAmount + "              ");
@@ -100,10 +137,43 @@ public class MainPanel extends JPanel {
     }
 
     private static void centerPanelAdjustment(JPanel centerPanel){
-
         temporary.setFont(new Font("Courier New",Font.BOLD,100));
         temporary.setForeground(Color.YELLOW);
         centerPanel.add(temporary);
+    }
+
+    private static void bottomPanelAdjustment(JPanel bottomPanel) {
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 30, 5, 30));
+
+        bottomPanel.add(Box.createHorizontalGlue());
+
+        nextTurn.addActionListener(e -> nextTurn());
+        nextTurn.setFont(new Font("Courier New", Font.BOLD, 18));
+        nextTurn.setForeground(Color.WHITE);
+        nextTurn.setBackground(new Color(50, 50, 50));
+        nextTurn.setFocusPainted(false);
+        nextTurn.setFocusable(false);
+        nextTurn.setPreferredSize(new Dimension(240, 45));
+        nextTurn.setMaximumSize(new Dimension(240, 45)); // Wymusza stały rozmiar w BoxLayout
+        bottomPanel.add(nextTurn);
+
+        bottomPanel.add(Box.createRigidArea(new Dimension(500, 0)));
+
+        currentTime.setFont(new Font("Courier New", Font.BOLD, 28));
+        currentTime.setForeground(Color.YELLOW);
+        bottomPanel.add(currentTime);
+
+        bottomPanel.add(Box.createHorizontalGlue());
+    }
+
+    private static void nextTurn() {
+        resetVariables();
+        currentDay++;
+    }
+
+    private static void resetVariables() {
+        //TODO mozliwosc wykonywania misji raz na dzien, wykonywanie innych dziennych czynnosci
     }
 
     public static void setLabelsFont(JPanel panel){
@@ -135,7 +205,7 @@ public class MainPanel extends JPanel {
         temporary.setText(String.valueOf(mainScreenPhase));
 
         JButton[] menuButtons = {
-                bDzielnica, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy
+                bDzielnica, bPersonel, bMisjeiSkoki, bCzarnyRynek, bMojaRodzina, bArsenal, bLegalneBiznesy
         };
 
         for (int i = 0; i < menuButtons.length; i++) {
@@ -149,6 +219,70 @@ public class MainPanel extends JPanel {
         }
     }
 
+    public static void checkTodayEvent(String date) {
+        for (GameEvent gameEvent : gameEvents) {
+            if (gameEvent.getEventDate().equals(date) && gameEvent.getEventShow() == 0) {
+                gameEvent.setEventShow(1);
+                showEventDialog(gameEvent);
+            }
+        }
+    }
+
+    private static void showEventDialog(GameEvent event) {
+        // Pobieramy główne okno gry na podstawie etykiety currentTime
+        Window parentWindow = SwingUtilities.getWindowAncestor(currentTime);
+        Frame parentFrame = (parentWindow instanceof Frame) ? (Frame) parentWindow : null;
+
+        // Przekazujemy parentFrame zamiast null - dzięki temu okno pojawi się NA głównym oknie
+        JDialog eventDialog = new JDialog(parentFrame, event.getEventTitle(), true);
+        eventDialog.setUndecorated(true);
+        eventDialog.setSize(650, 420);
+        eventDialog.setLocationRelativeTo(parentFrame); // Wyśrodkowanie względem okna gry
+
+        JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
+        contentPanel.setBackground(new Color(35, 15, 15));
+        contentPanel.setBorder(BorderFactory.createLineBorder(new Color(180, 130, 30), 3));
+
+        JLabel titleLabel = new JLabel(event.getEventTitle(), SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Courier New", Font.BOLD, 26));
+        titleLabel.setForeground(Color.YELLOW);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 15, 5, 15));
+
+        JTextArea textArea = new JTextArea(event.getEventText());
+        textArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        textArea.setForeground(Color.WHITE);
+        textArea.setBackground(new Color(35, 15, 15));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+
+        JButton closeBtn = new JButton("ZROZUMIALEM");
+        closeBtn.setFont(new Font("Courier New", Font.BOLD, 18));
+        closeBtn.setBackground(new Color(140, 100, 20));
+        closeBtn.setForeground(Color.YELLOW);
+        closeBtn.setFocusPainted(false);
+        closeBtn.setPreferredSize(new Dimension(200, 40));
+        closeBtn.addActionListener(e -> eventDialog.dispose());
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setBackground(new Color(35, 15, 15));
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        btnPanel.add(closeBtn);
+
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(textArea, BorderLayout.CENTER);
+        contentPanel.add(btnPanel, BorderLayout.SOUTH);
+
+        eventDialog.getRootPane().setDefaultButton(closeBtn);
+        eventDialog.add(contentPanel);
+        eventDialog.setVisible(true);
+    }
+
+    public int getMainScreenPhase(){
+        return(mainScreenPhase);
+    }
     public void addMoney(int amount) {
         this.moneyAmount += amount;
         this.moneyLabel.setText("GOTÓWKA: $" + this.moneyAmount);
